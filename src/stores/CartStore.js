@@ -1,12 +1,17 @@
-import { defineStore } from "pinia";
+import { defineStore, acceptHMRUpdate } from "pinia";
 import { groupBy, reduce } from "lodash";
+
+import { useLocalStorage } from "@vueuse/core";
 
 import { useAuthUserStore } from "@/stores/AuthUserStore";
 
 export const useCartStore = defineStore("CartStore", {
   state: () => {
     return {
-      items: [],
+      /* Usamos useLocalStorage de VueUse para guardar lo que teniamos en el carrito, y guardarlo en nuestro localstorage 
+      Cuando se refresque matendra los item */
+
+      items: useLocalStorage("CartStore:items", []),
     };
   },
 
@@ -58,3 +63,10 @@ export const useCartStore = defineStore("CartStore", {
     },
   },
 });
+
+/* HOT MODULE REPLACEMENT (HMR) para modo development, y asi no tener que recargar la pagina constantemente.
+No es necesario */
+
+if (import.meta.hot) {
+  import.meta.hot.accept(acceptHMRUpdate(useCartStore, import.meta.hot));
+}
